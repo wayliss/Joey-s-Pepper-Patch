@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🌶️ Joey's pepper patch  </title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Courier New", Courier, monospace;
+      background: conic-gradient(from 45deg, #000 0 25%, #fff 0 50%, #000 0 75%, #fff 0) 0 0 / 44px 44px fixed;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 12px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.4em;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 18px;
+      padding: 12px;
+    }
+    .card {
+      background: rgba(0,0,0,0.55);
+      border: 2px solid #222;
+      border-radius: 14px;
+      box-shadow: 4px 4px 0 #111;
+      text-align: center;
+      padding: 10px;
+      color: white;
+      cursor: pointer;
+    }
+    .card img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      display: block;
+      margin: 0 auto 8px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 300px;
+      position: relative;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌶️ Joey's Pepper Patch </h1>
+    <div class="grid" id="pepperGrid"></div>
+  </div>
+
+  <div class="modal" id="pepperModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="pepperName"></h2>
+      <img id="pepperImg" src="" alt="" style="width:64px;height:64px;" />
+      <p><strong>Scoville:</strong> <span id="pepperScoville"></span></p>
+      <p><strong>Taste:</strong> <span id="pepperTaste"></span></p>
+      <p><strong>Origin:</strong> <span id="pepperOrigin"></span></p>
+    </div>
+  </div>
+
+  <script>
+    const peppers = [
+      { key: "jalapeno", name: "Jalapeño", img: "images/Jalapeño.png", scoville: "2,500–8,000 SHU", taste: "Bright, vegetal, mild", origin: "Mexico" },
+      { key: "habanero", name: "Habanero", img: "images/Habanero.png", scoville: "100,000–350,000 SHU", taste: "Fruity, floral, throat burn", origin: "Amazon → Mexico" },
+      { key: "cayenne", name: "Cayenne", img: "images/Cayenne.png", scoville: "30,000–50,000 SHU", taste: "Neutral, sharp heat", origin: "French Guiana" },
+      { key: "tabasco", name: "Tabasco", img: "images/Tabasco.png", scoville: "30,000–50,000 SHU", taste: "peppery, quick heat", origin: "USA/Mexico" },
+      { key: "ghost_pepper", name: "Ghost Pepper", img: "images/Ghost.png", scoville: ">1,000,000 SHU", taste: "Smoky, slow burn", origin: "India" },
+      { key: "white_ghost", name: "White Ghost", img: "images/White_ghost.png", scoville: "~800,000 SHU", taste: "Clean heat, mild fruit", origin: "India" },
+      { key: "black_pearl", name: "Black Pearl", img: "images/Black_pearl.png", scoville: "10,000–30,000 SHU", taste: " mildy bitter heat", origin: "USA" },
+      { key: "ufo", name: "UFO", img: "images/Ufo.png", scoville: "Unknown", taste: "Sweet, mild", origin: "Hybrid" },
+      { key: "carolina_reaper", name: "Carolina Reaper", img: "images/Carolina_reaper.png", scoville: "1.4M–2.2M SHU", taste: "Smokey, sweet, extreme", origin: "South Carolina" },
+      { key: "thai", name: "Thai Chili", img: "images/Thai_chili.png", scoville: "50,000–100,000 SHU", taste: "savory quick heat", origin: "Thailand" },
+      { key: "peach", name: "Peach Bhut", img: "images/Peach_Bhut.png", scoville: "~800,000 SHU", taste: "Peachy burn", origin: "India" },
+      { key: "pink", name: "Pink Tiger", img: "images/Pink_tiger.png", scoville: "Unknown", taste: "Hot with stripes", origin: "Hybrid" },
+      { key: "fish", name: "Fish Pepper", img: "images/Fish.png", scoville: "5,000–30,000 SHU", taste: "Tangy, traditional", origin: "Africa" }
+    ];
+
+    const grid = document.getElementById('pepperGrid');
+    const modal = document.getElementById('pepperModal');
+    const pName = document.getElementById('pepperName');
+    const pImg = document.getElementById('pepperImg');
+    const pScov = document.getElementById('pepperScoville');
+    const pTaste = document.getElementById('pepperTaste');
+    const pOrigin = document.getElementById('pepperOrigin');
+
+    let audioCtx = null;
+    const liveNodes = [];
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function noiseBurst(ctx, dur = 0.5, start = 9000, end = 800, type = 'lowpass', vol = 0.5) {
+      const n = Math.floor(ctx.sampleRate * dur);
+      const buffer = ctx.createBuffer(1, n, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      const biq = ctx.createBiquadFilter();
+      biq.type = type;
+      biq.frequency.value = start;
+      biq.frequency.linearRampToValueAtTime(end, ctx.currentTime + dur);
+      const g = ctx.createGain();
+      g.gain.value = vol;
+      src.connect(biq); biq.connect(g); g.connect(ctx.destination);
+      src.start(); src.stop(ctx.currentTime + dur + 0.02);
+      liveNodes.push(src, biq, g);
+    }
+
+    function envTone(ctx, freq, a = 0.01, d = 0.15, s = 0.2, r = 0.2, type = 'sine', vol = 0.7) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      const now = ctx.currentTime;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(vol, now + a);
+      g.gain.linearRampToValueAtTime(vol * s, now + a + d);
+      g.gain.linearRampToValueAtTime(0, now + a + d + r);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(now + a + d + r + 0.05);
+      liveNodes.push(o, g);
+    }
+
+    function playPepperSound(key) {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      switch (key) {
+        case 'ghost_pepper': case 'white_ghost':
+          noiseBurst(ctx, 0.8, 12000, 800, 'lowpass', 0.4); break;
+        case 'fish': case 'ufo':
+          envTone(ctx, 600, 0.02, 0.08, 0.3, 0.2, 'sine', 0.5); break;
+        case 'jalapeno': case 'tabasco':
+          envTone(ctx, 750, 0.01, 0.06, 0.2, 0.1, 'triangle', 0.6); break;
+        case 'black_pearl':
+          envTone(ctx, 1100, 0.01, 0.1, 0.3, 0.15, 'square', 0.4); break;
+        case 'habanero':
+          envTone(ctx, 880, 0.01, 0.12, 0.2, 0.15, 'triangle', 0.7); break;
+        default:
+          noiseBurst(ctx, 0.5, 6500, 1800, 'highpass', 0.5); break;
+      }
+    }
+
+    function showPepper(p) {
+      pName.textContent = p.name;
+      pImg.src = p.img;
+      pScov.textContent = p.scoville;
+      pTaste.textContent = p.taste;
+      pOrigin.textContent = p.origin;
+      if ('speechSynthesis' in window) {
+        const speech = new SpeechSynthesisUtterance(`${p.name}. Scoville: ${p.scoville}. Taste: ${p.taste}. Origin: ${p.origin}`);
+        speech.lang = 'en-US'; speech.volume = 1;
+        speechSynthesis.speak(speech);
+      }
+      playPepperSound(p.key);
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+      liveNodes.forEach(node => { try { node.stop(); node.disconnect(); } catch {} });
+      liveNodes.length = 0;
+    }
+
+    peppers.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `<img src="${p.img}" alt="${p.name}"><div>${p.name}</div>`;
+      card.onclick = () => showPepper(p);
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
