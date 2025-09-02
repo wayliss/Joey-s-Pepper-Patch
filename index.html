@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🌶️ Joey's pepper patch  </title>
+  <title>🌶️ Joey's Pepper Patch</title>
   <style>
     body {
       margin: 0;
@@ -80,7 +80,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🌶️ Joey's Pepper Patch </h1>
+    <h1>🌶️ Joey's Pepper Patch</h1>
     <div class="grid" id="pepperGrid"></div>
   </div>
 
@@ -100,16 +100,17 @@
       { key: "jalapeno", name: "Jalapeño", img: "images/Jalapeño.png", scoville: "2,500–8,000 SHU", taste: "Bright, vegetal, mild", origin: "Mexico" },
       { key: "habanero", name: "Habanero", img: "images/Habanero.png", scoville: "100,000–350,000 SHU", taste: "Fruity, floral, throat burn", origin: "Amazon → Mexico" },
       { key: "cayenne", name: "Cayenne", img: "images/Cayenne.png", scoville: "30,000–50,000 SHU", taste: "Neutral, sharp heat", origin: "French Guiana" },
-      { key: "tabasco", name: "Tabasco", img: "images/Tabasco.png", scoville: "30,000–50,000 SHU", taste: "peppery, quick heat", origin: "USA/Mexico" },
+      { key: "tabasco", name: "Tabasco", img: "images/Tabasco.png", scoville: "30,000–50,000 SHU", taste: "Peppery, quick heat", origin: "USA/Mexico" },
       { key: "ghost_pepper", name: "Ghost Pepper", img: "images/Ghost.png", scoville: ">1,000,000 SHU", taste: "Smoky, slow burn", origin: "India" },
       { key: "white_ghost", name: "White Ghost", img: "images/White_ghost.png", scoville: "~800,000 SHU", taste: "Clean heat, mild fruit", origin: "India" },
-      { key: "black_pearl", name: "Black Pearl", img: "images/Black_pearl.png", scoville: "10,000–30,000 SHU", taste: " mildy bitter heat", origin: "USA" },
+      { key: "black_pearl", name: "Black Pearl", img: "images/Black_pearl.png", scoville: "10,000–30,000 SHU", taste: "Mildly bitter heat", origin: "USA" },
       { key: "ufo", name: "UFO", img: "images/Ufo.png", scoville: "Unknown", taste: "Sweet, mild", origin: "Hybrid" },
       { key: "carolina_reaper", name: "Carolina Reaper", img: "images/Carolina_reaper.png", scoville: "1.4M–2.2M SHU", taste: "Smokey, sweet, extreme", origin: "South Carolina" },
-      { key: "thai", name: "Thai Chili", img: "images/Thai_chili.png", scoville: "50,000–100,000 SHU", taste: "savory quick heat", origin: "Thailand" },
+      { key: "thai", name: "Thai Chili", img: "images/Thai_chili.png", scoville: "50,000–100,000 SHU", taste: "Savory quick heat", origin: "Thailand" },
       { key: "peach", name: "Peach Bhut", img: "images/Peach_Bhut.png", scoville: "~800,000 SHU", taste: "Peachy burn", origin: "India" },
       { key: "pink", name: "Pink Tiger", img: "images/Pink_tiger.png", scoville: "Unknown", taste: "Hot with stripes", origin: "Hybrid" },
-      { key: "fish", name: "Fish Pepper", img: "images/Fish.png", scoville: "5,000–30,000 SHU", taste: "Tangy, traditional", origin: "Africa" }
+      { key: "fish", name: "Fish Pepper", img: "images/Fish.png", scoville: "5,000–30,000 SHU", taste: "Tangy, traditional", origin: "Africa" },
+      { key: "trinidad_scorpion", name: "Trinidad Scorpion", img: "images/Trinidad_scorpion.png", scoville: "800,000–1,200,000 SHU", taste: "Fiery, sharp, earthy", origin: "Trinidad & Tobago" }
     ];
 
     const grid = document.getElementById('pepperGrid');
@@ -165,6 +166,8 @@
       switch (key) {
         case 'ghost_pepper': case 'white_ghost':
           noiseBurst(ctx, 0.8, 12000, 800, 'lowpass', 0.4); break;
+        case 'trinidad_scorpion':
+          noiseBurst(ctx, 0.7, 10000, 900, 'highpass', 0.5); break;
         case 'fish': case 'ufo':
           envTone(ctx, 600, 0.02, 0.08, 0.3, 0.2, 'sine', 0.5); break;
         case 'jalapeno': case 'tabasco':
